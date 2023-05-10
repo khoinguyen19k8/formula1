@@ -49,10 +49,6 @@ races_df = (
 
 # COMMAND ----------
 
-races_df.columns
-
-# COMMAND ----------
-
 races_renamed_df = (
     races_df.withColumnRenamed("raceId", "race_id")
     .withColumnRenamed("year", "race_year")

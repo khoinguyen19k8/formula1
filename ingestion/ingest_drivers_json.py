@@ -36,4 +36,38 @@ drivers_schema = StructType(
 
 # COMMAND ----------
 
+drivers_df = spark.read.schema(drivers_schema).json(
+    "dbfs:/mnt/formula1dlkhoinguyen19k8/raw/drivers.json"
+)
 
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # Rename columns and add new columns
+
+# COMMAND ----------
+
+drivers_transformed_df = (
+    drivers_df.withColumnRenamed("constructorId", "constructor_id")
+    .withColumnRenamed("constructorREF", "constructor_ref")
+    .withColumn("ingestion_date", current_timestamp())
+    .withColumn("name", concat(col("name.forename"), lit(" "), col("name.surname")))
+)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ## Drop unwanted columns
+
+# COMMAND ----------
+
+drivers_final_df = drivers_df.drop(col("url"))
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # Write to parquet
+
+# COMMAND ----------
+
+drivers_final_df.write.mode("overwrite").parquet("dbfs:/mnt/formula1dlkhoinguyen19k8/processed/drivers/")

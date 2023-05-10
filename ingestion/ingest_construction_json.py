@@ -23,14 +23,6 @@ constructors_df = spark.read.schema(constructors_schema).json(
 
 # COMMAND ----------
 
-constructors_df.printSchema()
-
-# COMMAND ----------
-
-display(constructors_df)
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC ## Drop unwanted columns from the dataframe
 
@@ -59,7 +51,3 @@ constructors_final_df = (
 # COMMAND ----------
 
 constructors_final_df.write.mode("overwrite").parquet("dbfs:/mnt/formula1dlkhoinguyen19k8/processed/constructors")
-
-# COMMAND ----------
-
-
