@@ -5,6 +5,9 @@
 # COMMAND ----------
 
 # MAGIC %run ../includes/configuration
+
+# COMMAND ----------
+
 # MAGIC %run ../includes/common_funcs
 
 # COMMAND ----------
@@ -16,7 +19,7 @@ from pyspark.sql.types import (
     StringType,
     DoubleType,
 )
-from pyspark.sql.functions import current_timestamp, col, concat
+from pyspark.sql.functions import col, concat
 
 # COMMAND ----------
 
@@ -41,7 +44,9 @@ qualifying_schema = StructType(
 
 # COMMAND ----------
 
-qualifying_df = spark.read.schema(qualifying_schema).json(f"{raw_folder_path}/qualifying", multiLine=True)
+qualifying_df = spark.read.schema(qualifying_schema).json(
+    f"{raw_folder_path}/qualifying", multiLine=True
+)
 
 # COMMAND ----------
 
@@ -50,11 +55,12 @@ qualifying_df = spark.read.schema(qualifying_schema).json(f"{raw_folder_path}/qu
 
 # COMMAND ----------
 
-qualifying_transformed_df = qualifying_df.withColumnRenamed("qualifyId", "qualify_id") \
-    .withColumnRenamed("raceId", "race_id") \
-    .withColumnRenamed("driverId", "driver_id") \
-    .withColumnRenamed("constructorId", "constructor_id") \
-    .withColumn("ingestion_date", current_timestamp())
+qualifying_transformed_df = add_ingestion_date(
+    qualifying_df.withColumnRenamed("qualifyId", "qualify_id")
+    .withColumnRenamed("raceId", "race_id")
+    .withColumnRenamed("driverId", "driver_id")
+    .withColumnRenamed("constructorId", "constructor_id")
+)
 
 # COMMAND ----------
 
@@ -67,4 +73,6 @@ qualifying_final_df = qualifying_transformed_df
 
 # COMMAND ----------
 
-qualifying_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/qualifying/")
+qualifying_final_df.write.mode("overwrite").parquet(
+    f"{processed_folder_path}/qualifying/"
+)

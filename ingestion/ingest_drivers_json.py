@@ -4,6 +4,14 @@
 
 # COMMAND ----------
 
+# MAGIC %run ../includes/configuration
+
+# COMMAND ----------
+
+# MAGIC %run ../includes/common_funcs
+
+# COMMAND ----------
+
 from pyspark.sql.types import (
     StructType,
     StructField,
@@ -11,7 +19,7 @@ from pyspark.sql.types import (
     StringType,
     DateType,
 )
-from pyspark.sql.functions import current_timestamp, col, to_timestamp, lit, concat
+from pyspark.sql.functions import col, to_timestamp, lit, concat
 
 # COMMAND ----------
 
@@ -30,15 +38,13 @@ drivers_schema = StructType(
         StructField("name", name_schema),
         StructField("dob", DateType(), True),
         StructField("nationality", StringType(), True),
-        StructField("url", StringType(), True)
+        StructField("url", StringType(), True),
     ]
 )
 
 # COMMAND ----------
 
-drivers_df = spark.read.schema(drivers_schema).json(
-    f"{raw_folder_path}/drivers.json"
-)
+drivers_df = spark.read.schema(drivers_schema).json(f"{raw_folder_path}/drivers.json")
 
 # COMMAND ----------
 
@@ -47,10 +53,9 @@ drivers_df = spark.read.schema(drivers_schema).json(
 
 # COMMAND ----------
 
-drivers_transformed_df = (
+drivers_transformed_df = add_ingestion_date(
     drivers_df.withColumnRenamed("constructorId", "constructor_id")
     .withColumnRenamed("constructorREF", "constructor_ref")
-    .withColumn("ingestion_date", current_timestamp())
     .withColumn("name", concat(col("name.forename"), lit(" "), col("name.surname")))
 )
 

@@ -4,6 +4,14 @@
 
 # COMMAND ----------
 
+# MAGIC %run ../includes/configuration
+
+# COMMAND ----------
+
+# MAGIC %run ../includes/common_funcs
+
+# COMMAND ----------
+
 from pyspark.sql.types import (
     StructType,
     StructField,
@@ -11,7 +19,7 @@ from pyspark.sql.types import (
     StringType,
     DoubleType,
 )
-from pyspark.sql.functions import current_timestamp, col
+from pyspark.sql.functions import col
 
 # COMMAND ----------
 
@@ -37,9 +45,11 @@ lap_times_df = spark.read.schema(lap_times_schema).csv(f"{raw_folder_path}/lap_t
 
 # COMMAND ----------
 
-lap_times_final_df = lap_times_df.withColumnRenamed("raceId", "race_id") \
-    .withColumnRenamed("driverId", "driver_id") \
-    .withColumn("ingestion_date", current_timestamp())
+lap_times_final_df = add_ingestion_date(
+    lap_times_df.withColumnRenamed("raceId", "race_id").withColumnRenamed(
+        "driverId", "driver_id"
+    )
+)
 
 # COMMAND ----------
 
@@ -48,4 +58,6 @@ lap_times_final_df = lap_times_df.withColumnRenamed("raceId", "race_id") \
 
 # COMMAND ----------
 
-lap_times_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/lap_times/")
+lap_times_final_df.write.mode("overwrite").parquet(
+    f"{processed_folder_path}/lap_times/"
+)

@@ -5,6 +5,9 @@
 # COMMAND ----------
 
 # MAGIC %run ../includes/configuration
+
+# COMMAND ----------
+
 # MAGIC %run ../includes/common_funcs
 
 # COMMAND ----------
@@ -61,7 +64,7 @@ results_df = spark.read.schema(results_schema).json(
 
 # COMMAND ----------
 
-results_transformed_df = (
+results_transformed_df = add_ingestion_date(
     results_df.withColumnRenamed("resultId", "result_id")
     .withColumnRenamed("raceId", "race_id")
     .withColumnRenamed("driverId", "driver_id")
@@ -71,7 +74,6 @@ results_transformed_df = (
     .withColumnRenamed("fastestLap", "fastest_lap")
     .withColumnRenamed("fastestLapTime", "fastest_lap_time")
     .withColumnRenamed("fastestLapSpeed", "fastest_lap_speed")
-    .withColumn("ingestion_date", current_timestamp())
 )
 
 # COMMAND ----------

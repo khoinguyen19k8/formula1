@@ -4,6 +4,14 @@
 
 # COMMAND ----------
 
+# MAGIC %run ../includes/configuration
+
+# COMMAND ----------
+
+# MAGIC %run ../includes/common_funcs
+
+# COMMAND ----------
+
 from pyspark.sql.types import (
     StructType,
     StructField,
@@ -11,7 +19,7 @@ from pyspark.sql.types import (
     StringType,
     DoubleType,
 )
-from pyspark.sql.functions import current_timestamp, col
+from pyspark.sql.functions import col
 
 # COMMAND ----------
 
@@ -29,7 +37,9 @@ pit_stops_schema = StructType(
 
 # COMMAND ----------
 
-pit_stops_df = spark.read.schema(pit_stops_schema).json(f"{raw_folder_path}/pit_stops.json", multiLine=True)
+pit_stops_df = spark.read.schema(pit_stops_schema).json(
+    f"{raw_folder_path}/pit_stops.json", multiLine=True
+)
 
 # COMMAND ----------
 
@@ -38,9 +48,11 @@ pit_stops_df = spark.read.schema(pit_stops_schema).json(f"{raw_folder_path}/pit_
 
 # COMMAND ----------
 
-pit_stops_final_df = pit_stops_df.withColumnRenamed("raceId", "race_id") \
-    .withColumnRenamed("driverId", "driver_id") \
-    .withColumn("ingestion_date", current_timestamp())
+pit_stops_final_df = add_ingestion_date(
+    pit_stops_df.withColumnRenamed("raceId", "race_id").withColumnRenamed(
+        "driverId", "driver_id"
+    )
+)
 
 # COMMAND ----------
 
@@ -49,4 +61,6 @@ pit_stops_final_df = pit_stops_df.withColumnRenamed("raceId", "race_id") \
 
 # COMMAND ----------
 
-pit_stops_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/pit_stops/")
+pit_stops_final_df.write.mode("overwrite").parquet(
+    f"{processed_folder_path}/pit_stops/"
+)

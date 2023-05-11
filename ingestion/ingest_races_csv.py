@@ -5,6 +5,9 @@
 # COMMAND ----------
 
 # MAGIC %run ../includes/configuration
+
+# COMMAND ----------
+
 # MAGIC %run ../includes/common_funcs
 
 # COMMAND ----------
@@ -17,7 +20,7 @@ from pyspark.sql.types import (
     DoubleType,
     TimestampType,
 )
-from pyspark.sql.functions import current_timestamp, col, to_timestamp, lit, concat
+from pyspark.sql.functions import col, to_timestamp, lit, concat
 
 # COMMAND ----------
 
@@ -94,7 +97,7 @@ races_selected_df = races_transformed_df.select(
 
 # COMMAND ----------
 
-races_final_df = races_selected_df.withColumn("ingestion_date", current_timestamp())
+races_final_df = add_ingestion_date(races_selected_df)
 
 # COMMAND ----------
 

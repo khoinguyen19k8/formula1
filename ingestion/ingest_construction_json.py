@@ -5,11 +5,14 @@
 # COMMAND ----------
 
 # MAGIC %run ../includes/configuration
+
+# COMMAND ----------
+
 # MAGIC %run ../includes/common_funcs
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col, current_timestamp
+from pyspark.sql.functions import col
 
 # COMMAND ----------
 
@@ -42,10 +45,10 @@ constructors_dropped_df = constructors_df.drop(col("url"))
 
 # COMMAND ----------
 
-constructors_final_df = (
-    constructors_dropped_df.withColumnRenamed("constructorId", "constructor_id")
-    .withColumnRenamed("constructorREF", "constructor_ref")
-    .withColumn("ingestion_date", current_timestamp())
+constructors_final_df = add_ingestion_date(
+    constructors_dropped_df.withColumnRenamed(
+        "constructorId", "constructor_id"
+    ).withColumnRenamed("constructorREF", "constructor_ref")
 )
 
 # COMMAND ----------
@@ -55,4 +58,6 @@ constructors_final_df = (
 
 # COMMAND ----------
 
-constructors_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/constructors")
+constructors_final_df.write.mode("overwrite").parquet(
+    f"{processed_folder_path}/constructors"
+)
