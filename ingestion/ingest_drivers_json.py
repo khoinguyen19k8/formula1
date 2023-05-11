@@ -54,8 +54,8 @@ drivers_df = spark.read.schema(drivers_schema).json(f"{raw_folder_path}/drivers.
 # COMMAND ----------
 
 drivers_transformed_df = add_ingestion_date(
-    drivers_df.withColumnRenamed("constructorId", "constructor_id")
-    .withColumnRenamed("constructorREF", "constructor_ref")
+    drivers_df.withColumnRenamed("driverId", "driver_id")
+    .withColumnRenamed("driverRef", "driver_ref")
     .withColumn("name", concat(col("name.forename"), lit(" "), col("name.surname")))
 )
 
@@ -66,7 +66,7 @@ drivers_transformed_df = add_ingestion_date(
 
 # COMMAND ----------
 
-drivers_final_df = drivers_df.drop(col("url"))
+drivers_final_df = drivers_transformed_df.drop(col("url"))
 
 # COMMAND ----------
 
