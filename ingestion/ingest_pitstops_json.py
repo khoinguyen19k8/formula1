@@ -29,7 +29,7 @@ pit_stops_schema = StructType(
 
 # COMMAND ----------
 
-pit_stops_df = spark.read.schema(pit_stops_schema).json("dbfs:/mnt/formula1dlkhoinguyen19k8/raw/pit_stops.json", multiLine=True)
+pit_stops_df = spark.read.schema(pit_stops_schema).json(f"{raw_folder_path}/pit_stops.json", multiLine=True)
 
 # COMMAND ----------
 
@@ -49,4 +49,4 @@ pit_stops_final_df = pit_stops_df.withColumnRenamed("raceId", "race_id") \
 
 # COMMAND ----------
 
-pit_stops_final_df.write.mode("overwrite").parquet("dbfs:/mnt/formula1dlkhoinguyen19k8/processed/pit_stops/")
+pit_stops_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/pit_stops/")

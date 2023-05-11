@@ -37,7 +37,7 @@ drivers_schema = StructType(
 # COMMAND ----------
 
 drivers_df = spark.read.schema(drivers_schema).json(
-    "dbfs:/mnt/formula1dlkhoinguyen19k8/raw/drivers.json"
+    f"{raw_folder_path}/drivers.json"
 )
 
 # COMMAND ----------
@@ -70,4 +70,4 @@ drivers_final_df = drivers_df.drop(col("url"))
 
 # COMMAND ----------
 
-drivers_final_df.write.mode("overwrite").parquet("dbfs:/mnt/formula1dlkhoinguyen19k8/processed/drivers/")
+drivers_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/drivers/")

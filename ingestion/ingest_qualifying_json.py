@@ -4,6 +4,11 @@
 
 # COMMAND ----------
 
+# MAGIC %run ../includes/configuration
+# MAGIC %run ../includes/common_funcs
+
+# COMMAND ----------
+
 from pyspark.sql.types import (
     StructType,
     StructField,
@@ -36,7 +41,7 @@ qualifying_schema = StructType(
 
 # COMMAND ----------
 
-qualifying_df = spark.read.schema(qualifying_schema).json("dbfs:/mnt/formula1dlkhoinguyen19k8/raw/qualifying", multiLine=True)
+qualifying_df = spark.read.schema(qualifying_schema).json(f"{raw_folder_path}/qualifying", multiLine=True)
 
 # COMMAND ----------
 
@@ -62,4 +67,4 @@ qualifying_final_df = qualifying_transformed_df
 
 # COMMAND ----------
 
-qualifying_final_df.write.mode("overwrite").parquet("dbfs:/mnt/formula1dlkhoinguyen19k8/processed/qualifying/")
+qualifying_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/qualifying/")

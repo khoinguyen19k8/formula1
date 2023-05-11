@@ -5,6 +5,7 @@
 # COMMAND ----------
 
 # MAGIC %run ../includes/configuration
+# MAGIC %run ../includes/common_funcs
 
 # COMMAND ----------
 
@@ -30,7 +31,7 @@ circuits_df = spark \
     .read \
     .option("header", True) \
     .schema(circuits_schema) \
-    .csv("dbfs:/mnt/formula1dlkhoinguyen19k8/raw/circuits.csv")
+    .csv(f"{raw_folder_path}/circuits.csv")
 
 # COMMAND ----------
 
@@ -86,4 +87,4 @@ circuits_final_df = circuits_renamed_df \
 
 circuits_final_df \
     .write \
-    .parquet("dbfs:/mnt/formula1dlkhoinguyen19k8/processed/circuits", mode="overwrite")
+    .parquet(f"{processed_folder_path}/circuits", mode="overwrite")

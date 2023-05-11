@@ -4,6 +4,11 @@
 
 # COMMAND ----------
 
+# MAGIC %run ../includes/configuration
+# MAGIC %run ../includes/common_funcs
+
+# COMMAND ----------
+
 from pyspark.sql.types import (
     StructType,
     StructField,
@@ -46,7 +51,7 @@ results_schema = StructType(
 # COMMAND ----------
 
 results_df = spark.read.schema(results_schema).json(
-    "dbfs:/mnt/formula1dlkhoinguyen19k8/raw/results.json"
+    f"{raw_folder_path}/results.json"
 )
 
 # COMMAND ----------
@@ -86,5 +91,5 @@ results_final_df = results_transformed_df.drop(col("statusId"))
 # COMMAND ----------
 
 results_final_df.write.mode("overwrite").partitionBy("race_id").parquet(
-    "dbfs:/mnt/formula1dlkhoinguyen19k8/processed/results/"
+    f"{processed_folder_path}/results/"
 )

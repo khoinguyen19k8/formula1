@@ -28,7 +28,7 @@ lap_times_schema = StructType(
 
 # COMMAND ----------
 
-lap_times_df = spark.read.schema(lap_times_schema).csv("dbfs:/mnt/formula1dlkhoinguyen19k8/raw/lap_times")
+lap_times_df = spark.read.schema(lap_times_schema).csv(f"{raw_folder_path}/lap_times")
 
 # COMMAND ----------
 
@@ -48,4 +48,4 @@ lap_times_final_df = lap_times_df.withColumnRenamed("raceId", "race_id") \
 
 # COMMAND ----------
 
-lap_times_final_df.write.mode("overwrite").parquet("dbfs:/mnt/formula1dlkhoinguyen19k8/processed/lap_times/")
+lap_times_final_df.write.mode("overwrite").parquet(f"{processed_folder_path}/lap_times/")

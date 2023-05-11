@@ -4,6 +4,11 @@
 
 # COMMAND ----------
 
+# MAGIC %run ../includes/configuration
+# MAGIC %run ../includes/common_funcs
+
+# COMMAND ----------
+
 from pyspark.sql.types import (
     StructType,
     StructField,
@@ -39,7 +44,7 @@ races_schema = StructType(
 races_df = (
     spark.read.option("header", True)
     .schema(races_schema)
-    .csv("dbfs:/mnt/formula1dlkhoinguyen19k8/raw/races.csv")
+    .csv(f"{raw_folder_path}/races.csv")
 )
 
 # COMMAND ----------
@@ -99,5 +104,5 @@ races_final_df = races_selected_df.withColumn("ingestion_date", current_timestam
 # COMMAND ----------
 
 races_final_df.write.partitionBy("race_year").parquet(
-    "dbfs:/mnt/formula1dlkhoinguyen19k8/processed/races", mode="overwrite"
+    f"{processed_folder_path}/races", mode="overwrite"
 )
