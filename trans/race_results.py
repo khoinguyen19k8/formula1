@@ -38,7 +38,7 @@ results_racesDriversConstructorsCircuits_df = results_df.join(races_df, results_
         circuits_df["location"].alias("circuit_location"),
         drivers_df["name"].alias("driver_name"), drivers_df["number"].alias("driver_number"), drivers_df["nationality"].alias("driver_nationality"),
         constructors_df["name"].alias("team"),
-        results_df["grid"], results_df["fastest_lap"], results_df["time"].alias("race_time"), results_df["points"]   
+        results_df["grid"], results_df["fastest_lap"], results_df["time"].alias("race_time"), results_df["points"], results_df["position"]   
     )
 
 # COMMAND ----------
