@@ -60,4 +60,4 @@ raceResults_report_df = add_ingestion_date(results_racesDriversConstructorsCircu
 
 # COMMAND ----------
 
-raceResults_report_df.write.mode("overwrite").parquet(f"{presentation_folder_path}/race_results")
+raceResults_report_df.write.mode("overwrite").format("parquet").saveAsTable("f1_presentation.race_results")
