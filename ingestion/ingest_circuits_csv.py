@@ -4,6 +4,11 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_file_date", "2021-03-21")
+v_file_date = dbutils.widgets.get("p_file_date")
+
+# COMMAND ----------
+
 # MAGIC %run ../includes/configuration
 
 # COMMAND ----------
@@ -41,7 +46,7 @@ circuits_schema = StructType(
 circuits_df = (
     spark.read.option("header", True)
     .schema(circuits_schema)
-    .csv(f"{raw_folder_path}/circuits.csv")
+    .csv(f"{raw_folder_path}/{v_file_date}/circuits.csv")
 )
 
 # COMMAND ----------
@@ -51,7 +56,7 @@ circuits_df = (
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col
+from pyspark.sql.functions import col, lit
 
 # COMMAND ----------
 
@@ -79,6 +84,7 @@ circuits_renamed_df = (
     .withColumnRenamed("lat", "latitude")
     .withColumnRenamed("lng", "longitude")
     .withColumnRenamed("alt", "altitude")
+    .withColumn("file_date", lit(v_file_date))
 )
 
 # COMMAND ----------
