@@ -4,6 +4,12 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_file_date", "2021-03-28")
+v_file_date = dbutils.widgets.get("p_file_date")
+spark.conf.set("spark.sql.sources.partitionOverwriteMode","dynamic")
+
+# COMMAND ----------
+
 # MAGIC %run ../includes/configuration
 
 # COMMAND ----------
@@ -19,7 +25,7 @@ from pyspark.sql.types import (
     StringType,
     DoubleType,
 )
-from pyspark.sql.functions import current_timestamp, col, concat
+from pyspark.sql.functions import current_timestamp, col, concat, lit
 
 # COMMAND ----------
 
@@ -54,7 +60,7 @@ results_schema = StructType(
 # COMMAND ----------
 
 results_df = spark.read.schema(results_schema).json(
-    f"{raw_folder_path}/results.json"
+    f"{raw_folder_path}/{v_file_date}/results.json"
 )
 
 # COMMAND ----------
@@ -74,6 +80,7 @@ results_transformed_df = add_ingestion_date(
     .withColumnRenamed("fastestLap", "fastest_lap")
     .withColumnRenamed("fastestLapTime", "fastest_lap_time")
     .withColumnRenamed("fastestLapSpeed", "fastest_lap_speed")
+    .withColumn("file_date", lit(v_file_date))
 )
 
 # COMMAND ----------
@@ -88,8 +95,8 @@ results_final_df = results_transformed_df.drop(col("statusId"))
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Write to parquet
+# MAGIC # Write to table
 
 # COMMAND ----------
 
-results_final_df.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.results")
+insert_by_partition(results_final_df, "f1_processed", "results", "race_id")

@@ -4,6 +4,12 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_file_date", "2021-03-28")
+v_file_date = dbutils.widgets.get("p_file_date")
+spark.conf.set("spark.sql.sources.partitionOverwriteMode","dynamic")
+
+# COMMAND ----------
+
 # MAGIC %run ../includes/configuration
 
 # COMMAND ----------
@@ -19,7 +25,7 @@ from pyspark.sql.types import (
     StringType,
     DoubleType,
 )
-from pyspark.sql.functions import col, concat
+from pyspark.sql.functions import col, concat, lit
 
 # COMMAND ----------
 
@@ -45,7 +51,7 @@ qualifying_schema = StructType(
 # COMMAND ----------
 
 qualifying_df = spark.read.schema(qualifying_schema).json(
-    f"{raw_folder_path}/qualifying", multiLine=True
+    f"{raw_folder_path}/{v_file_date}/qualifying", multiLine=True
 )
 
 # COMMAND ----------
@@ -60,12 +66,13 @@ qualifying_transformed_df = add_ingestion_date(
     .withColumnRenamed("raceId", "race_id")
     .withColumnRenamed("driverId", "driver_id")
     .withColumnRenamed("constructorId", "constructor_id")
+    .withColumn("file_date", lit(v_file_date))
 )
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Write to parquet
+# MAGIC # Write to table
 
 # COMMAND ----------
 
@@ -73,4 +80,4 @@ qualifying_final_df = qualifying_transformed_df
 
 # COMMAND ----------
 
-qualifying_final_df.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.qualifying")
+insert_by_partition(qualifying_final_df, "f1_processed", "qualifying", "race_id")

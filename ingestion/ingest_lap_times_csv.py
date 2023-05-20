@@ -4,6 +4,12 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_file_date", "2021-03-28")
+v_file_date = dbutils.widgets.get("p_file_date")
+spark.conf.set("spark.sql.sources.partitionOverwriteMode","dynamic")
+
+# COMMAND ----------
+
 # MAGIC %run ../includes/configuration
 
 # COMMAND ----------
@@ -19,7 +25,7 @@ from pyspark.sql.types import (
     StringType,
     DoubleType,
 )
-from pyspark.sql.functions import col
+from pyspark.sql.functions import col, lit
 
 # COMMAND ----------
 
@@ -36,7 +42,7 @@ lap_times_schema = StructType(
 
 # COMMAND ----------
 
-lap_times_df = spark.read.schema(lap_times_schema).csv(f"{raw_folder_path}/lap_times")
+lap_times_df = spark.read.schema(lap_times_schema).csv(f"{raw_folder_path}/{v_file_date}/lap_times")
 
 # COMMAND ----------
 
@@ -46,16 +52,17 @@ lap_times_df = spark.read.schema(lap_times_schema).csv(f"{raw_folder_path}/lap_t
 # COMMAND ----------
 
 lap_times_final_df = add_ingestion_date(
-    lap_times_df.withColumnRenamed("raceId", "race_id").withColumnRenamed(
-        "driverId", "driver_id"
-    )
+    lap_times_df \
+        .withColumnRenamed("raceId", "race_id") \
+        .withColumnRenamed("driverId", "driver_id") \
+        .withColumn("file_date", lit(v_file_date))
 )
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Write to parquet
+# MAGIC # Write to table
 
 # COMMAND ----------
 
-lap_times_final_df.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.lap_times")
+insert_by_partition(lap_times_final_df, "f1_processed", "lap_times", "race_id")

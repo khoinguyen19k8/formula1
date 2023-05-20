@@ -4,6 +4,12 @@
 
 # COMMAND ----------
 
+dbutils.widgets.text("p_file_date", "2021-03-28")
+v_file_date = dbutils.widgets.get("p_file_date")
+spark.conf.set("spark.sql.sources.partitionOverwriteMode","dynamic")
+
+# COMMAND ----------
+
 # MAGIC %run ../includes/configuration
 
 # COMMAND ----------
@@ -19,7 +25,7 @@ from pyspark.sql.types import (
     StringType,
     DoubleType,
 )
-from pyspark.sql.functions import col
+from pyspark.sql.functions import col, lit
 
 # COMMAND ----------
 
@@ -38,7 +44,7 @@ pit_stops_schema = StructType(
 # COMMAND ----------
 
 pit_stops_df = spark.read.schema(pit_stops_schema).json(
-    f"{raw_folder_path}/pit_stops.json", multiLine=True
+    f"{raw_folder_path}/{v_file_date}/pit_stops.json", multiLine=True
 )
 
 # COMMAND ----------
@@ -49,16 +55,17 @@ pit_stops_df = spark.read.schema(pit_stops_schema).json(
 # COMMAND ----------
 
 pit_stops_final_df = add_ingestion_date(
-    pit_stops_df.withColumnRenamed("raceId", "race_id").withColumnRenamed(
-        "driverId", "driver_id"
-    )
+    pit_stops_df \
+        .withColumnRenamed("raceId", "race_id") \
+        .withColumnRenamed("driverId", "driver_id") \
+        .withColumn("file_date", lit(v_file_date))
 )
 
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC # Write to parquet
+# MAGIC # Write to table
 
 # COMMAND ----------
 
-pit_stops_final_df.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.pit_stops")
+insert_by_partition(pit_stops_final_df, "f1_processed", "pit_stops", "race_id")
