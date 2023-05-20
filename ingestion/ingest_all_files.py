@@ -46,15 +46,3 @@ for dt_id in date_ids:
 
 for dt_id in date_ids:
     dbutils.notebook.run("./ingest_qualifying_json", 0, {"p_file_date" : dt_id})
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC SELECT
-# MAGIC   race_id, COUNT(1)
-# MAGIC FROM
-# MAGIC   f1_processed.results
-# MAGIC GROUP BY
-# MAGIC   race_id
-# MAGIC ORDER BY
-# MAGIC   race_id DESC;
