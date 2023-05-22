@@ -91,7 +91,9 @@ results_transformed_df = add_ingestion_date(
 
 # COMMAND ----------
 
-results_final_df = results_transformed_df.drop(col("statusId"))
+results_final_df = results_transformed_df \
+    .dropDuplicates(["race_id", "driver_id"]) \
+    .drop(col("statusId"))
 
 # COMMAND ----------
 
