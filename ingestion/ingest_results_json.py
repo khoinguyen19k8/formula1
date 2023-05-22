@@ -6,7 +6,8 @@
 
 dbutils.widgets.text("p_file_date", "2021-03-28")
 v_file_date = dbutils.widgets.get("p_file_date")
-spark.conf.set("spark.sql.sources.partitionOverwriteMode","dynamic")
+spark.conf.set("spark.databricks.optimizer.dynamicPartitionPruning", "true")
+# spark.conf.set("spark.sql.sources.partitionOverwriteMode","dynamic")
 
 # COMMAND ----------
 
@@ -99,4 +100,5 @@ results_final_df = results_transformed_df.drop(col("statusId"))
 
 # COMMAND ----------
 
-insert_by_partition(results_final_df, "f1_processed", "results", "race_id")
+merge_conditions = "tgt.result_id = upd.result_id"
+merge_delta_data(results_final_df, "f1_processed", "results", merge_conditions, "race_id")

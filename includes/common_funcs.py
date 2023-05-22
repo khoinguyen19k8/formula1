@@ -1,5 +1,6 @@
 # Databricks notebook source
 from pyspark.sql.functions import current_timestamp
+from delta.tables import DeltaTable
 
 # COMMAND ----------
 
@@ -25,3 +26,33 @@ def insert_by_partition(df, database, table, partition_col):
         df.write.mode("overwrite").insertInto(table_instance)
     else:
         df.write.mode("overwrite").partitionBy(partition_col).format("parquet").saveAsTable(table_instance)
+
+# COMMAND ----------
+
+def merge_delta_data(df, database, table, merge_conditions , partition_col):
+    """
+    Merge a dataframe into a Delta Table.
+    ---------
+    Parameters:
+    df: Pyspark Dataframe
+    database: Pyspark SQL Database
+    table: Pyspark SQL Table 
+    merge_conditions: String - a string contains the merge conditions
+    partition_col: String - name of the partition column
+    """
+    
+    table_instance = f"{database}.{table}"
+
+    if spark._jsparkSession.catalog().tableExists(table_instance):
+        deltaTable = DeltaTable.forName(spark, table_instance)
+
+        deltaTable.alias('tgt') \
+        .merge(
+            df.alias("upd"),
+            f"{merge_conditions} AND tgt.{partition_col} = upd.{partition_col}"
+        ) \
+        .whenMatchedUpdateAll() \
+        .whenNotMatchedInsertAll() \
+        .execute()
+    else:
+        df.write.mode("overwrite").partitionBy(partition_col).format("delta").saveAsTable(table_instance)

@@ -6,7 +6,8 @@
 
 dbutils.widgets.text("p_file_date", "2021-03-28")
 v_file_date = dbutils.widgets.get("p_file_date")
-spark.conf.set("spark.sql.sources.partitionOverwriteMode","dynamic")
+spark.conf.set("spark.databricks.optimizer.dynamicPartitionPruning", "true")
+# spark.conf.set("spark.sql.sources.partitionOverwriteMode","dynamic")
 
 # COMMAND ----------
 
@@ -68,4 +69,5 @@ pit_stops_final_df = add_ingestion_date(
 
 # COMMAND ----------
 
-insert_by_partition(pit_stops_final_df, "f1_processed", "pit_stops", "race_id")
+merge_conditions = "tgt.race_id = upd.race_id AND tgt.driver_id = upd.driver_id AND tgt.stop = upd.stop"
+merge_delta_data(pit_stops_final_df, "f1_processed", "pit_stops", merge_conditions, "race_id")
