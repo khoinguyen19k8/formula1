@@ -111,4 +111,4 @@ races_final_df = add_ingestion_date(races_selected_df)
 
 # COMMAND ----------
 
-races_final_df.write.mode("overwrite").format("parquet").saveAsTable("f1_processed.races")
+races_final_df.write.mode("overwrite").format("delta").saveAsTable("f1_processed.races")
