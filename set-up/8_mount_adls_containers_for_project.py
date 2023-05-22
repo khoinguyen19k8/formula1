@@ -22,6 +22,7 @@ def mount_adls(storage_account_name, container_name):
 
     # Mount the storage account container
 
+    # Unmount the container if it has been mounted before to avoid error.
     if any(mount.mountPoint == f"/mnt/{storage_account_name}/{container_name}" for mount in dbutils.fs.mounts()):
         dbutils.fs.unmount(f"/mnt/{storage_account_name}/{container_name}")
 
@@ -32,7 +33,7 @@ def mount_adls(storage_account_name, container_name):
 
 # COMMAND ----------
 
-project_containers = ["raw", "processed", "presentation"]
+project_containers = ["demo", "raw", "processed", "presentation"]
 for container in project_containers:
     mount_adls("formula1dlkhoinguyen19k8", container)
 
