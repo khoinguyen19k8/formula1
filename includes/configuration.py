@@ -1,5 +1,5 @@
 # Databricks notebook source
-
+spark.conf.set("spark.databricks.optimizer.dynamicPartitionPruning", "true")
 
 # COMMAND ----------
 

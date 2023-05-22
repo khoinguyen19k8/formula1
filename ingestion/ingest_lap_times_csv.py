@@ -6,8 +6,6 @@
 
 dbutils.widgets.text("p_file_date", "2021-03-28")
 v_file_date = dbutils.widgets.get("p_file_date")
-spark.conf.set("spark.databricks.optimizer.dynamicPartitionPruning", "true")
-# spark.conf.set("spark.sql.sources.partitionOverwriteMode","dynamic")
 
 # COMMAND ----------
 
