@@ -15,3 +15,8 @@ for dt_id in date_ids:
 
 for dt_id in date_ids:
     dbutils.notebook.run("./constructor_standings", 0, {"p_file_date" : dt_id})
+
+# COMMAND ----------
+
+for dt_id in date_ids:
+    dbutils.notebook.run("./calculated_race_results", 0, {"p_file_date" : dt_id})

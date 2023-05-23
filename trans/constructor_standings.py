@@ -6,7 +6,6 @@
 
 dbutils.widgets.text("p_file_date", "2021-03-28")
 v_file_date = dbutils.widgets.get("p_file_date")
-spark.conf.set("spark.sql.sources.partitionOverwriteMode","dynamic")
 
 # COMMAND ----------
 
@@ -23,7 +22,7 @@ from pyspark.sql.window import Window
 
 # COMMAND ----------
 
-race_result_list = spark.read.parquet(f"{presentation_folder_path}/race_results") \
+race_result_list = spark.read.format("delta").load(f"{presentation_folder_path}/race_results") \
     .filter(f"file_date = '{v_file_date}'") \
     .select("race_year") \
     .distinct() \
@@ -35,7 +34,7 @@ race_year_list = [race_year.race_year for race_year in race_result_list]
 
 # COMMAND ----------
 
-race_results_df = spark.read.parquet(f"{presentation_folder_path}/race_results") \
+race_results_df = spark.read.format("delta").load(f"{presentation_folder_path}/race_results") \
     .filter(F.col("race_year").isin(race_year_list))
 
 # COMMAND ----------
@@ -69,4 +68,5 @@ final_constructor_standings_df = constructor_standings_df.withColumn("rank", F.r
 
 # COMMAND ----------
 
-insert_by_partition(final_constructor_standings_df, "f1_presentation", "constructor_standings", "race_year")
+merge_conditions = "tgt.race_year = upd.race_year AND tgt.team = upd.team"
+merge_delta_data(final_constructor_standings_df, "f1_presentation", "constructor_standings", merge_conditions, "race_year")
