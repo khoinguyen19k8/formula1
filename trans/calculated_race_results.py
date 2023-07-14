@@ -83,3 +83,4 @@ spark.sql(f"""
 # MAGIC     upd.calculated_points,
 # MAGIC     current_timestamp
 # MAGIC   );
+# MAGIC

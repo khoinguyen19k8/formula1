@@ -2,6 +2,7 @@
 # MAGIC %md
 # MAGIC
 # MAGIC # Mount Azure Data Lake for the project
+# MAGIC
 
 # COMMAND ----------
 
